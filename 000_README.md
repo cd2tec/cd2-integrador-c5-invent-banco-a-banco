@@ -43,7 +43,7 @@ Qualquer alteração **aprovada e aplicada** em objetos CD2 no Oracle deve ser r
 
 1. Atualizar o `.sql` do objeto alterado **ou** re-exportar com o script abaixo
 2. Revisar `git diff` nesta pasta
-3. Commit e push quando o time autorizar
+3. Commit e push **somente nesta pasta** quando o time autorizar (nada fora de `cd2-integrador-c5-invent-banco-a-banco/` vai para este GitHub)
 
 Detalhes: [`docs/07_GOVERNANCA_GIT.md`](docs/07_GOVERNANCA_GIT.md)
 

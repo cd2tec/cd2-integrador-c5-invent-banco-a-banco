@@ -57,6 +57,8 @@ git commit -m "sync: <objeto ou resumo do fix>"
 git push origin main
 ```
 
+**Escopo de commit/push:** somente arquivos **dentro** de `cd2-integrador-c5-invent-banco-a-banco/`. Alterações na raiz SORTER (`AGENTE_IA_*`, `.cursor/rules/`, `monitor_app/`, `execucao_projeto_sorter/`, etc.) **não** entram neste repositório.
+
 ## O que não versionar aqui
 
 - Credenciais ou connection strings
