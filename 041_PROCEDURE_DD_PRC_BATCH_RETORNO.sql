@@ -1,0 +1,129 @@
+-- =============================================================================
+-- PROCEDURE: DD_PRC_BATCH_RETORNO
+-- Exportado de CD2@2026-07-01 (fonte: banco remoto)
+-- =============================================================================
+
+CREATE OR REPLACE PROCEDURE "DD_PRC_BATCH_RETORNO" (
+  P_PREFIXO_ETIQUETA IN VARCHAR2 DEFAULT '%',
+  P_LIMIT	     IN NUMBER	 DEFAULT 2000,
+  P_NROCARGA_MIN     IN NUMBER	 DEFAULT NULL
+) AS
+  V_ERR	      VARCHAR2(4000);
+  V_N_RET	NUMBER := 0;
+  V_STATUS_SORTER VARCHAR2(15);
+BEGIN
+  /* Fase 2 - RETORNO/FECHAMENTO: ja enviadas; atualiza C5 sem reenviar GPT.
+     Performance: prioridade elegiveis; FECHA so apos captura/reconcilia se status
+     ja for o mesmo criterio de entrada do 022 (INDUZIDO/RETORNO_PRODUTO). */
+  FOR R IN (
+    SELECT ranked.CODBARRAETQ
+      FROM (
+	SELECT b.CODBARRAETQ,
+	       ROW_NUMBER() OVER (
+		 ORDER BY b.prioridade_fecha,
+			  b.nrocarga DESC,
+			  b.CODBARRAETQ
+	       ) AS seq
+	  FROM (
+	    SELECT c.CODBARRAETQ,
+		   e.NROCARGA,
+		   CASE
+		     WHEN NVL(e.STATUS_SORTER, c.STATUS_SORTER) IN (
+			    'RETORNO_PRODUTO', 'INDUZIDO'
+			  ) THEN 0
+		     ELSE 1
+		   END AS prioridade_fecha,
+		   ROW_NUMBER() OVER (
+		     PARTITION BY c.CODBARRAETQ
+		     ORDER BY c.CODBARRAETQ
+		   ) AS dedupe_rn
+	      FROM CD2.DDV_SORTER_CORRELACAO c
+	      JOIN CD2.DDV_SORTER_CORRELACAO_ENRIQ e
+		ON e.CODBARRAETQ = c.CODBARRAETQ
+	      JOIN CONSINCO.MLO_INTEGRACAOSORTER i
+		ON i.CODBARRAETQ = c.CODBARRAETQ
+	      LEFT JOIN CONSINCO.MLO_MONTAGEMSORTER m
+		ON m.CODBARRAETQ = c.CODBARRAETQ
+	     WHERE c.CODBARRAETQ LIKE P_PREFIXO_ETIQUETA
+	       AND (P_NROCARGA_MIN IS NULL OR e.NROCARGA >= P_NROCARGA_MIN)
+	       /* C5 marcou exclusao/cancelamento: nao reprocessar retorno/fechamento. */
+	       AND NVL(TRIM(i.INDOPERACAO), ' ') <> 'D'
+	       AND (
+		     EXISTS (
+		       SELECT 1
+			 FROM CD2.DD_SORTER_EVENTO_CTRL ev
+			WHERE ev.CODBARRAETQ = c.CODBARRAETQ
+			  AND ev.ORIGEM = 'ENVIO'
+			  AND ev.STATUS_ORIGEM IN (
+				'ENVIADO_INVENT', 'ENVIO_AGG_INVENT'
+			      )
+		     )
+		     OR (
+		       NVL(e.STATUS_SORTER, c.STATUS_SORTER) IN (
+			 'RETORNO_PRODUTO', 'INDUZIDO'
+		       )
+		       AND EXISTS (
+			 SELECT 1
+			   FROM CD2.DD_SORTER_EVENTO_CTRL ev2
+			  WHERE ev2.CODBARRAETQ = c.CODBARRAETQ
+			    AND ev2.ORIGEM = 'ENVIO'
+			    AND ev2.STATUS_ORIGEM = 'ERRO_DESTINO_INTEGRADO'
+			    AND NVL(ev2.OBS, ' ') LIKE 'GPT JA INTEGRADO%'
+		       )
+		       AND NOT EXISTS (
+			 SELECT 1
+			   FROM CD2.DD_SORTER_EVENTO_CTRL ev3
+			  WHERE ev3.CODBARRAETQ = c.CODBARRAETQ
+			    AND ev3.ORIGEM = 'ENVIO'
+			    AND ev3.STATUS_ORIGEM IN (
+			      'ENVIADO_INVENT', 'ENVIO_AGG_INVENT'
+			    )
+		       )
+		     )
+		   )
+	       AND NOT (
+		     NVL(i.INDPROCESSADO, 'N') = 'S'
+		 AND NVL(m.INDPROCESSADO, 'N') = 'S'
+		   )
+	  ) b
+	 WHERE b.dedupe_rn = 1
+      ) ranked
+     WHERE ranked.seq <= P_LIMIT
+  ) LOOP
+    BEGIN
+      CD2.DD_PRC_CAPTURA_STATUS_INVENT(P_CODBARRAETQ => R.CODBARRAETQ, P_LIMIT => 50);
+      CD2.DD_PRC_RECONCILIA_ETIQUETA(P_CODBARRAETQ => R.CODBARRAETQ);
+      BEGIN
+	SELECT p.STATUS_SORTER
+	  INTO V_STATUS_SORTER
+	  FROM CD2.DDV_SORTER_PENDENCIAS p
+	 WHERE p.CODBARRAETQ = R.CODBARRAETQ
+	   AND ROWNUM = 1;
+      EXCEPTION
+	WHEN NO_DATA_FOUND THEN
+	  V_STATUS_SORTER := NULL;
+      END;
+      IF V_STATUS_SORTER IN ('INDUZIDO', 'RETORNO_PRODUTO') THEN
+	CD2.DD_PRC_FECHA_C5_ETIQUETA(P_CODBARRAETQ => R.CODBARRAETQ);
+      END IF;
+      V_N_RET := V_N_RET + 1;
+    EXCEPTION
+      WHEN OTHERS THEN
+	ROLLBACK;
+	V_ERR := SUBSTR(SQLERRM, 1, 3500);
+	INSERT INTO CD2.DD_SORTER_EVENTO_CTRL (
+	  ID_EVENTO, CODBARRAETQ, ORIGEM, STATUS_ORIGEM, DTA_EVENTO_ORIGEM, DTA_CAPTURA, HASH_EVENTO, OBS
+	) VALUES (
+	  CD2.SQ_DD_SORTER_EVENTO_CTRL.NEXTVAL,
+	  R.CODBARRAETQ,
+	  'BATCH',
+	  'ERRO_RETORNO',
+	  SYSDATE,
+	  SYSDATE,
+	  R.CODBARRAETQ || '|BATCH|ERRO_RET|' || TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS'),
+	  V_ERR
+	);
+	COMMIT;
+    END;
+  END LOOP;
+END;

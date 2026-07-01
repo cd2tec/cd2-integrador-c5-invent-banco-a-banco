@@ -1,0 +1,56 @@
+# Tabelas e objetos externos
+
+## Tabelas CD2 (integrador)
+
+| Tabela | Colunas principais | Papel |
+|--------|-------------------|-------|
+| `DD_SORTER_EVENTO_CTRL` | `CODBARRAETQ`, `ORIGEM`, `STATUS_ORIGEM`, `OBS`, `DTA_CAPTURA`, `NROCARGA` | Auditoria e controle de idempotência |
+| `DD_SORTER_BATCH_CARGA_CTRL` | `NROCARGA`, `STATUS`, `VOLS_ELEGIVEIS`, `WORKER_ID`, `PRIORIDADE` | Fila de cargas para envio |
+| `DD_SORTER_VINCULO_RETORNO_ETQ` | `CODBARRAETQ`, chaves retorno, `DTA_VINCULO` | Rastreio retorno |
+| `DD_SORTER_GPT_RETORNO_FILA` | Colunas espelho GPT retorno | GTT — staging V3 |
+
+## Invent (@INVENT via dblink)
+
+| Tabela | Direção | Uso |
+|--------|---------|-----|
+| `GPT_INTEGRA_REMESSA` | CD2 → Invent | Remessa de envio (levas/SEQLOTE) |
+| `GPT_RETORNO_MONTAGEM_PALETES` | Invent → CD2 | Fonte retorno GPT-first |
+| `GPT_RETORNO_MONTAGEM_PALETES_ITEM` | Invent → CD2 | Itens do retorno |
+| `GPT_CANCELAMENTO_REMESSAS` | Bidirecional | Cancelamentos |
+
+## Consinco (grants em 045)
+
+### Leitura (SELECT)
+
+`MLO_CARGAEXPED`, `MAX_EMPRESA`, `MAP_PRODUTO`, `MAP_PRODCODIGO`, `MLO_CARGAEPRODUTO`, `MAP_FAMEMBALAGEM`, `MRL_PRODEMPRESAWM`, `MLO_PRODEMBWM`, `MLO_LINHASEPARACAO`, `MLO_TIPESPECIE`, `MLO_CARGAEPALETE`, `MLO_PALETE`, `MLO_PRODUTIVO`, `S_MLO_CARREGAMENTOPORPALETE`
+
+### Leitura + atualização
+
+| Tabela | Operações CD2 |
+|--------|----------------|
+| `MLO_INTEGRACAOSORTER` | SELECT, UPDATE |
+| `MLO_MONTAGEMSORTER` | SELECT, INSERT, UPDATE |
+| `MLO_CARREGAMENTOPORPALETE` | SELECT, INSERT, UPDATE |
+| `MLO_PALETECARREG` | SELECT, INSERT, UPDATE |
+| `MLO_PALCARREGRF` | SELECT, INSERT, UPDATE |
+| `MLO_CARREGAMENTOPORPALMASTER` | SELECT, INSERT, UPDATE |
+| `MLO_CHECAGEMSORTER` | SELECT, INSERT, UPDATE |
+| `MLO_PRODUTIVOSORTER` | SELECT, INSERT, UPDATE |
+| `MLO_TIPESPECIESORTER` | SELECT, INSERT, UPDATE |
+| `MLO_PRODUTOSORTER` | SELECT, INSERT, UPDATE |
+| `MLO_CARGARECEB` | SELECT, INSERT, UPDATE |
+| `MLO_PALETEQTDE` | SELECT, UPDATE |
+
+## Mapeamento mental
+
+```
+ENVIO:  MLO_INTEGRACAOSORTER → [CD2 views] → GPT_INTEGRA_REMESSA
+RETORNO: GPT_RETORNO_* → [CD2 V3] → MLO_MONTAGEMSORTER + paletes
+LOG:    DD_SORTER_EVENTO_CTRL (ambos os fluxos)
+```
+
+## Tabelas Consinco centrais por fluxo
+
+**Envio:** `MLO_INTEGRACAOSORTER` (etiqueta entrada), `MLO_TIPESPECIE` (destino/palete), `MAP_FAMEMBALAGEM` / `MAP_PRODCODIGO` (CODACESSO)
+
+**Retorno:** `MLO_MONTAGEMSORTER`, `MLO_PALETECARREG`, `MLO_CARREGAMENTOPORPALETE`, `MLO_CARREGAMENTOPORPALMASTER`
