@@ -45,3 +45,4 @@ Camada técnica Oracle (**owner `CD2`**) que integra o **Consinco (C5)** com o *
 | [04_OPERACAO_E_MONITORAMENTO.md](04_OPERACAO_E_MONITORAMENTO.md) | Jobs, filas, throughput |
 | [05_VALIDACAO_E_TROUBLESHOOTING.md](05_VALIDACAO_E_TROUBLESHOOTING.md) | Protocolo de checagem |
 | [06_TABELAS_E_OBJETOS_EXTERNOS.md](06_TABELAS_E_OBJETOS_EXTERNOS.md) | Tabelas C5, Invent e CD2 |
+| [07_GOVERNANCA_GIT.md](07_GOVERNANCA_GIT.md) | Sincronização banco → Git (obrigatório após deploy) |

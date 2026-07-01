@@ -35,6 +35,22 @@ Detalhes: [`docs/03_IMPLANTACAO_NOVO_CLIENTE.md`](docs/03_IMPLANTACAO_NOVO_CLIEN
 
 Lista completa de arquivos exportados: `_export_manifest.json`
 
+## Governança Git (obrigatório)
+
+**Repositório:** https://github.com/cd2tec/cd2-integrador-c5-invent-banco-a-banco
+
+Qualquer alteração **aprovada e aplicada** em objetos CD2 no Oracle deve ser refletida neste pacote **na mesma tarefa**:
+
+1. Atualizar o `.sql` do objeto alterado **ou** re-exportar com o script abaixo
+2. Revisar `git diff` nesta pasta
+3. Commit e push quando o time autorizar
+
+Detalhes: [`docs/07_GOVERNANCA_GIT.md`](docs/07_GOVERNANCA_GIT.md)
+
 ## Script de re-export
 
-Para atualizar a partir do banco: `monitor_app/backend/export_cd2_integrador.mjs`
+A partir do workspace SORTER (credencial PROD):
+
+```bash
+node monitor_app/backend/export_cd2_integrador.mjs
+```
