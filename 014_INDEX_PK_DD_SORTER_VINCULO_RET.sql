@@ -1,6 +1,6 @@
 -- =============================================================================
 -- INDEX: PK_DD_SORTER_VINCULO_RET
--- Exportado de CD2@2026-07-01 (fonte: banco remoto)
+-- Exportado de CD2@2026-07-06 (fonte: banco remoto)
 -- =============================================================================
 
 CREATE UNIQUE INDEX "CD2"."PK_DD_SORTER_VINCULO_RET" ON "CD2"."DD_SORTER_VINCULO_RETORNO_ETQ" ("ID_VINCULO") 

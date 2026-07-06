@@ -1,6 +1,6 @@
 -- =============================================================================
 -- INDEX: UK_DD_SORTER_VINCULO_ETQ
--- Exportado de CD2@2026-07-01 (fonte: banco remoto)
+-- Exportado de CD2@2026-07-06 (fonte: banco remoto)
 -- =============================================================================
 
 CREATE UNIQUE INDEX "CD2"."UK_DD_SORTER_VINCULO_ETQ" ON "CD2"."DD_SORTER_VINCULO_RETORNO_ETQ" ("CODBARRAETQ") 

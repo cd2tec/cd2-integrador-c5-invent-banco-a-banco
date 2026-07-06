@@ -1,4 +1,24 @@
+-- =============================================================================
 -- VIEW: DDV_SORTER_SLA_HML
--- Exportado CD2 2026-07-01
+-- Exportado de CD2@2026-07-06 (fonte: banco remoto)
+-- =============================================================================
 
 CREATE OR REPLACE VIEW CD2."DDV_SORTER_SLA_HML" AS
+SELECT
+  i.CODBARRAETQ,
+  i.DTA_CAPTURA AS DTA_INVENT,
+  f.DTA_CAPTURA AS DTA_FECHAMENTO,
+  ROUND((f.DTA_CAPTURA - i.DTA_CAPTURA) * 24 * 60, 2) AS MINUTOS_INVENT_ATE_FECHAMENTO
+FROM CD2.DD_SORTER_EVENTO_CTRL i
+JOIN CD2.DD_SORTER_EVENTO_CTRL f
+  ON f.CODBARRAETQ = i.CODBARRAETQ
+WHERE i.ORIGEM = 'INVENT'
+  AND f.ORIGEM = 'FECHAMENTO'
+  AND f.STATUS_ORIGEM IN ('C5_FECHADO', 'C5_JA_FECHADO')
+  AND f.ID_EVENTO = (
+    SELECT MAX(ff.ID_EVENTO)
+    FROM CD2.DD_SORTER_EVENTO_CTRL ff
+    WHERE ff.CODBARRAETQ = f.CODBARRAETQ
+      AND ff.ORIGEM = 'FECHAMENTO'
+      AND ff.STATUS_ORIGEM IN ('C5_FECHADO', 'C5_JA_FECHADO')
+  )

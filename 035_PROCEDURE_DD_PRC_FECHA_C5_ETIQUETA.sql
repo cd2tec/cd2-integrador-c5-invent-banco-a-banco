@@ -1,6 +1,6 @@
 -- =============================================================================
 -- PROCEDURE: DD_PRC_FECHA_C5_ETIQUETA
--- Exportado de CD2@2026-07-01 (fonte: banco remoto; enriquecimento master jul/2026)
+-- Exportado de CD2@2026-07-06 (fonte: banco remoto)
 -- =============================================================================
 
 CREATE OR REPLACE PROCEDURE "DD_PRC_FECHA_C5_ETIQUETA" (

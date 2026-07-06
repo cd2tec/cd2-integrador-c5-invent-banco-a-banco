@@ -1,9 +1,9 @@
 -- =============================================================================
--- INDEX: IX_DD_SORTER_EVT_ETQ
--- Exportado de CD2@2026-07-01 (fonte: banco remoto)
+-- INDEX: UK_DD_SORTER_EVT_HASH
+-- Exportado de CD2@2026-07-06 (fonte: banco remoto)
 -- =============================================================================
 
-CREATE INDEX "CD2"."IX_DD_SORTER_EVT_ETQ" ON "CD2"."DD_SORTER_EVENTO_CTRL" ("CODBARRAETQ") 
+CREATE UNIQUE INDEX "CD2"."UK_DD_SORTER_EVT_HASH" ON "CD2"."DD_SORTER_EVENTO_CTRL" ("HASH_EVENTO") 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
   PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1

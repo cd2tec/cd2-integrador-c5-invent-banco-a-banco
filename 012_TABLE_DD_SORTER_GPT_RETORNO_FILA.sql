@@ -1,6 +1,6 @@
 -- =============================================================================
 -- TABLE: DD_SORTER_GPT_RETORNO_FILA
--- Exportado de CD2@2026-07-01 (fonte: banco remoto)
+-- Exportado de CD2@2026-07-06 (fonte: banco remoto)
 -- =============================================================================
 
 CREATE GLOBAL TEMPORARY TABLE "CD2"."DD_SORTER_GPT_RETORNO_FILA" 

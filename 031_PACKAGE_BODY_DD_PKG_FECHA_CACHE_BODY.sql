@@ -1,9 +1,9 @@
 -- =============================================================================
 -- PACKAGE_BODY: DD_PKG_FECHA_CACHE
--- Exportado de CD2@2026-07-01 (fonte: banco remoto)
+-- Exportado de CD2@2026-07-06 (fonte: banco remoto)
 -- =============================================================================
 
-CREATE OR REPLACE PACKAGE BODY DD_PKG_FECHA_CACHE AS
+CREATE OR REPLACE PACKAGE BODY     DD_PKG_FECHA_CACHE AS
   TYPE T_NUM_MAP IS TABLE OF NUMBER INDEX BY VARCHAR2(200);
   G_QTD_PEND  T_NUM_MAP;
   G_CNT_PALLET T_NUM_MAP;

@@ -1,9 +1,9 @@
 -- =============================================================================
 -- PROCEDURE: DD_PRC_BATCH_ENVIO_WORKER
--- Exportado de CD2@2026-07-01 (fonte: banco remoto)
+-- Exportado de CD2@2026-07-06 (fonte: banco remoto)
 -- =============================================================================
 
-CREATE OR REPLACE PROCEDURE "DD_PRC_BATCH_ENVIO_WORKER" (
+CREATE OR REPLACE PROCEDURE       "DD_PRC_BATCH_ENVIO_WORKER" (
   P_WORKER_ID IN VARCHAR2,
   P_LIMIT	  IN NUMBER   DEFAULT 200
 ) AS

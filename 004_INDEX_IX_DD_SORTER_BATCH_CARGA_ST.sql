@@ -1,6 +1,6 @@
 -- =============================================================================
 -- INDEX: IX_DD_SORTER_BATCH_CARGA_ST
--- Exportado de CD2@2026-07-01 (fonte: banco remoto)
+-- Exportado de CD2@2026-07-06 (fonte: banco remoto)
 -- =============================================================================
 
 CREATE INDEX "CD2"."IX_DD_SORTER_BATCH_CARGA_ST" ON "CD2"."DD_SORTER_BATCH_CARGA_CTRL" ("STATUS", "PRIORIDADE" DESC, "NROCARGA" DESC) 

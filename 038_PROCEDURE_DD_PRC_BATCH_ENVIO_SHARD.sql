@@ -1,9 +1,9 @@
 -- =============================================================================
 -- PROCEDURE: DD_PRC_BATCH_ENVIO_SHARD
--- Exportado de CD2@2026-07-01 (fonte: banco remoto)
+-- Exportado de CD2@2026-07-06 (fonte: banco remoto)
 -- =============================================================================
 
-CREATE OR REPLACE PROCEDURE "DD_PRC_BATCH_ENVIO_SHARD" (
+CREATE OR REPLACE PROCEDURE       "DD_PRC_BATCH_ENVIO_SHARD" (
   P_NROCARGA    IN NUMBER,
   P_SHARD_TOTAL IN NUMBER,
   P_SHARD_ID    IN NUMBER,

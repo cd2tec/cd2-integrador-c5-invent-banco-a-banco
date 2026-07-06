@@ -1,9 +1,9 @@
 -- =============================================================================
 -- JOBS: PROD_ENVIO_3W_RETORNO_6W
--- Exportado de CD2@2026-07-01 (fonte: banco remoto)
+-- Exportado de CD2@2026-07-06 (fonte: banco remoto)
 -- =============================================================================
 
--- Jobs de producao ativos em 2026-07-01
+-- Jobs de producao ativos em 2026-07-06
 -- Envio: 3 workers | Retorno: 6 workers V3
 
 

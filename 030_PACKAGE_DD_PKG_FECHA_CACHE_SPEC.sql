@@ -1,9 +1,9 @@
 -- =============================================================================
 -- PACKAGE: DD_PKG_FECHA_CACHE
--- Exportado de CD2@2026-07-01 (fonte: banco remoto)
+-- Exportado de CD2@2026-07-06 (fonte: banco remoto)
 -- =============================================================================
 
-CREATE OR REPLACE PACKAGE DD_PKG_FECHA_CACHE AS
+CREATE OR REPLACE PACKAGE     DD_PKG_FECHA_CACHE AS
   PROCEDURE CLEAR_ALL;
   FUNCTION GET_QTD_PEND(P_KEY IN VARCHAR2, P_VAL OUT NUMBER) RETURN BOOLEAN;
   PROCEDURE SET_QTD_PEND(P_KEY IN VARCHAR2, P_VAL IN NUMBER);

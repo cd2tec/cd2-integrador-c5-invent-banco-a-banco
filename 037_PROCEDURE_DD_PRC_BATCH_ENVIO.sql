@@ -1,9 +1,9 @@
 -- =============================================================================
 -- PROCEDURE: DD_PRC_BATCH_ENVIO
--- Exportado de CD2@2026-07-01 (fonte: banco remoto)
+-- Exportado de CD2@2026-07-06 (fonte: banco remoto)
 -- =============================================================================
 
-CREATE OR REPLACE PROCEDURE "DD_PRC_BATCH_ENVIO" (
+CREATE OR REPLACE PROCEDURE       "DD_PRC_BATCH_ENVIO" (
 P_PREFIXO_ETIQUETA IN VARCHAR2 DEFAULT '%',
 P_LIMIT	     IN NUMBER	 DEFAULT 100,
 P_NROCARGA_MIN	   IN NUMBER	 DEFAULT NULL,

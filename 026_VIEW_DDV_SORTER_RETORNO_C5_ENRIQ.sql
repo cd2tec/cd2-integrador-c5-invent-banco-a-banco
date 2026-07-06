@@ -1,4 +1,23 @@
+-- =============================================================================
 -- VIEW: DDV_SORTER_RETORNO_C5_ENRIQ
--- Exportado CD2 2026-07-01
+-- Exportado de CD2@2026-07-06 (fonte: banco remoto)
+-- =============================================================================
 
 CREATE OR REPLACE VIEW CD2."DDV_SORTER_RETORNO_C5_ENRIQ" AS
+SELECT
+  m.CODBARRAETQ,
+  m.SEQPALETECARREG,
+  m.NROEMPRESA,
+  m.CODPRODUTIVO,
+  m.INDPROCESSADO,
+  m.INDOPERACAO,
+  m.DTAHORINIMONT,
+  m.DTAHORFINALMONT,
+  m.DTAHORALTERACAO,
+  pr.NOMEREDUZ				    AS PRODUTIVO_NOME,
+  pr.CODRH				    AS PRODUTIVO_CODRH,
+  pr.CODEQUIPE				    AS PRODUTIVO_EQUIPE
+FROM CONSINCO.MLO_MONTAGEMSORTER m
+LEFT JOIN CONSINCO.MLO_PRODUTIVO pr
+  ON pr.NROEMPRESA = m.NROEMPRESA
+ AND pr.CODPRODUTIVO = m.CODPRODUTIVO

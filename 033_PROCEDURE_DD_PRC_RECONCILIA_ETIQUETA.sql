@@ -1,9 +1,9 @@
 -- =============================================================================
 -- PROCEDURE: DD_PRC_RECONCILIA_ETIQUETA
--- Exportado de CD2@2026-07-01 (fonte: banco remoto)
+-- Exportado de CD2@2026-07-06 (fonte: banco remoto)
 -- =============================================================================
 
-CREATE OR REPLACE PROCEDURE "DD_PRC_RECONCILIA_ETIQUETA" (
+CREATE OR REPLACE PROCEDURE       "DD_PRC_RECONCILIA_ETIQUETA" (
   P_CODBARRAETQ IN VARCHAR2
 ) AS
   V_STATUS VARCHAR2(40);

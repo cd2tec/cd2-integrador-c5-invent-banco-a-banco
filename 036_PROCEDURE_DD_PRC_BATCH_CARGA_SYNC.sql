@@ -1,9 +1,9 @@
 -- =============================================================================
 -- PROCEDURE: DD_PRC_BATCH_CARGA_SYNC
--- Exportado de CD2@2026-07-01 (fonte: banco remoto)
+-- Exportado de CD2@2026-07-06 (fonte: banco remoto)
 -- =============================================================================
 
-CREATE OR REPLACE PROCEDURE "DD_PRC_BATCH_CARGA_SYNC" AS
+CREATE OR REPLACE PROCEDURE       "DD_PRC_BATCH_CARGA_SYNC" AS
 BEGIN
   MERGE INTO CD2.DD_SORTER_BATCH_CARGA_CTRL t
   USING (

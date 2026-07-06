@@ -1,9 +1,9 @@
 -- =============================================================================
--- INDEX: IX_DD_SORTER_EVT_CAPT
--- Exportado de CD2@2026-07-01 (fonte: banco remoto)
+-- INDEX: IX_DD_SORTER_EVT_ETQ
+-- Exportado de CD2@2026-07-06 (fonte: banco remoto)
 -- =============================================================================
 
-CREATE INDEX "CD2"."IX_DD_SORTER_EVT_CAPT" ON "CD2"."DD_SORTER_EVENTO_CTRL" ("DTA_CAPTURA") 
+CREATE INDEX "CD2"."IX_DD_SORTER_EVT_ETQ" ON "CD2"."DD_SORTER_EVENTO_CTRL" ("CODBARRAETQ") 
   PCTFREE 10 INITRANS 2 MAXTRANS 255 COMPUTE STATISTICS 
   STORAGE(INITIAL 65536 NEXT 1048576 MINEXTENTS 1 MAXEXTENTS 2147483645
   PCTINCREASE 0 FREELISTS 1 FREELIST GROUPS 1
