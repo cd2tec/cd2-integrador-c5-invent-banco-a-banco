@@ -4,6 +4,8 @@
 -- Alt 2026-07-15: liberacao faturamento (DTAHORLIBFATURAMENTO/STATUS=L) somente
 -- quando TODOS os retornos GPT da master Invent estiverem vinculados no CD2.
 -- Evita job WMS_FATURACARREGAMENTO_AUTO faturar master incompleta.
+-- Alt 2026-07-17: gate vinculo GPT 1:1 — nao monta na C5 sem UK exclusiva
+-- (corrida DUP_VAL em ID_GPT_RETORNO montava volume extra na master errada).
 -- =============================================================================
 
 CREATE OR REPLACE PROCEDURE "DD_PRC_FECHA_C5_ETIQUETA" (
@@ -521,21 +523,52 @@ BEGIN
 	      );
 	    EXCEPTION
 	      WHEN DUP_VAL_ON_INDEX THEN
-		NULL;
+		/* UK em CODBARRAETQ (ja vinculado) ou ID_GPT_RETORNO (corrida: outro volume tomou o slot).
+		   Se nao for vinculo nosso, limpa e nao monta — evita N+1 na mesma master. */
+		BEGIN
+		  SELECT v.ID_GPT_RETORNO, v.SEQPALETECARREG, v.PALLET_INVENT
+		    INTO V_ID_GPT_RETORNO, V_SEQPALETE, V_PALLET_INVENT
+		    FROM CD2.DD_SORTER_VINCULO_RETORNO_ETQ v
+		   WHERE v.CODBARRAETQ = P_CODBARRAETQ;
+		EXCEPTION
+		  WHEN NO_DATA_FOUND THEN
+		    V_ID_GPT_RETORNO := NULL;
+		    V_PALLET_INVENT := NULL;
+		    V_SEQPALETE := NULL;
+		END;
 	      WHEN OTHERS THEN
 		V_ID_GPT_RETORNO := NULL;
+		V_PALLET_INVENT := NULL;
+		V_SEQPALETE := NULL;
 	    END;
 	  END IF;
       END;
     END IF;
-    IF V_SEQPALETE_VOLUME IS NOT NULL THEN
-      V_SEQPALETE := V_SEQPALETE_VOLUME;
-    ELSIF V_SEQPALETE IS NULL AND V_PALLET_INVENT IS NOT NULL THEN
+    /* Gate duro: montagem C5 so com vinculo 1:1 etiqueta ↔ ID GPT.
+       Sem isso, volume extra (ex.: 60a caixa com Invent devolvendo 59) ia para a master errada. */
+    BEGIN
+      SELECT v.ID_GPT_RETORNO,
+	     NVL(v.SEQPALETECARREG, V_SEQPALETE),
+	     v.PALLET_INVENT
+	INTO V_ID_GPT_RETORNO, V_SEQPALETE, V_PALLET_INVENT
+	FROM CD2.DD_SORTER_VINCULO_RETORNO_ETQ v
+       WHERE v.CODBARRAETQ = P_CODBARRAETQ;
+    EXCEPTION
+      WHEN NO_DATA_FOUND THEN
+	V_ID_GPT_RETORNO := NULL;
+	V_PALLET_INVENT := NULL;
+	V_SEQPALETE := NULL;
+	V_SEQPALETE_VOLUME := NULL;
+    END;
+    IF V_SEQPALETE IS NULL AND V_PALLET_INVENT IS NOT NULL THEN
       IF REGEXP_LIKE(NVL(V_PALLET_INVENT, ''), '^[Mm][0-9]+$') THEN
 	V_SEQPALETE := TO_NUMBER(SUBSTR(V_PALLET_INVENT, 2));
       ELSIF REGEXP_LIKE(NVL(V_PALLET_INVENT, ''), '^[0-9]+$') THEN
 	V_SEQPALETE := TO_NUMBER(V_PALLET_INVENT);
       END IF;
+    ELSIF V_SEQPALETE IS NULL AND V_SEQPALETE_VOLUME IS NOT NULL THEN
+      /* So usa RF se ja houver vinculo GPT (bloco acima); senao VOLUME ja foi zerado. */
+      V_SEQPALETE := V_SEQPALETE_VOLUME;
     END IF;
     IF V_SEQPALETE IS NULL THEN
       BEGIN
@@ -568,6 +601,8 @@ BEGIN
 		'SEM VOLUME FISICO C5 (SEQPROD=' || NVL(TO_CHAR(V_SEQPRODUTO), '?') || ' TIPESPECIE=' || V_TIPESPECIE || ' LOJA=' || NVL(TO_CHAR(V_LOJA_DESTINO), '?') || ')'
 	      WHEN NVL(V_CNT_PALLET_CAND, 0) > 1 THEN
 		'RETORNO INVENT AMBIGUO: MAIS DE UM PALLET PARA ' || TO_CHAR(V_QTD_PEND_DEST) || ' VOLUMES PENDENTES (LOJA=' || NVL(TO_CHAR(V_LOJA_DESTINO), '?') || ')'
+	      WHEN V_ID_GPT_RETORNO IS NULL THEN
+		'SEM VINCULO GPT EXCLUSIVO (SLOT ESGOTADO OU CORRIDA). PROD=' || NVL(TO_CHAR(V_SEQPRODUTO), '?') || ' LOJA=' || NVL(TO_CHAR(V_LOJA_DESTINO), '?') || ' — NAO MONTA SEM RETORNO INVENT'
 	      WHEN V_PALLET_INVENT IS NULL THEN
 		'SEM LINHA GPT RETORNO (PROD=' || NVL(TO_CHAR(V_SEQPRODUTO), '?') || ' LOJA=' || NVL(TO_CHAR(V_LOJA_DESTINO), '?') || ')'
 	      ELSE
