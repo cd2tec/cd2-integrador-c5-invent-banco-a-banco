@@ -2,6 +2,9 @@
 -- VIEW: DDV_SORTER_FILA_ENVIO_ENRIQ
 -- CODACESSO_PRINCIPAL: DUN (MAP TIPCODIGO D) na QTDEMBALAGEM da carga/palete;
 --   se ausente, fallback EAN (TIPCODIGO E) na mesma embalagem.
+-- Alt 2026-07-20: multiplos DUN na mesma embalagem → LISTAGG separados por virgula
+--   (Invent/Velox aceita N codigos; indução casa o codigo fisico correto).
+--   Cap: SUBSTR 1000 (= GPT_INTEGRA_REMESSA.CODACESSO / V_CODACESSO na 034).
 -- =============================================================================
 
 CREATE OR REPLACE VIEW CD2."DDV_SORTER_FILA_ENVIO_ENRIQ" AS
@@ -98,7 +101,11 @@ LEFT JOIN (
 SELECT
   x.SEQPRODUTO,
   x.QTDEMBALAGEM,
-  MAX(x.CODACESSO) KEEP (DENSE_RANK FIRST ORDER BY x.CODACESSO) AS CODACESSO_PRINCIPAL
+  SUBSTR(
+    LISTAGG(x.CODACESSO, ',') WITHIN GROUP (ORDER BY x.CODACESSO),
+    1,
+    1000
+  ) AS CODACESSO_PRINCIPAL
 FROM CONSINCO.MAP_PRODCODIGO x
 WHERE x.TIPCODIGO = 'D'
 GROUP BY x.SEQPRODUTO, x.QTDEMBALAGEM
